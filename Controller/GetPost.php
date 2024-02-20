@@ -14,18 +14,31 @@ class GetPost
 
     }
 
-    public function postSum() : void
+    public function postProcess(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
-                $this->setFirstNumber(intval($_POST["firstNumber"]));
-                $this->setSecondNumber(intval($_POST["secondNumber"]));
-                $sum = $this->getFirstNumber() + $this->getSecondNumber();
-               echo "Сума введених чисел:" . $sum;
-               echo "<br/>" . "Method Post";
-
+            if(isset($_POST["firstNumber"]) && isset($_POST["secondNumber"]))
+            {
+                $this->setNumbers(intval($_POST["firstNumber"]), intval($_POST["secondNumber"]));
+                $this->calculateSum();
+            } else
+            {
+                $this->handleBadRequest();
+            }
         }
     }
 
+    private function calculateSum () : void
+    {
+        $sum = $this->getFirstNumber() + $this->getSecondNumber();
+        echo "Сума введених чисел:" . $sum;
+        echo "<br/>" . "Method Post";
+    }
+    private function handleBadRequest(): void
+    {
+        http_response_code(400);
+        echo "Number or numbers was not set";
+    }
 
     /**
      * @return int
@@ -46,34 +59,11 @@ class GetPost
     /**
      * @param int $firstNumber
      */
-    public function setFirstNumber(int $firstNumber): void
+    public function setNumbers(int $firstNumber,int $secondNumber): void
     {
-        if (isset($firstNumber))
-        {
             $this->firstNumber = $firstNumber;
-        }
-        elseif (!isset($_POST["firstNumber"]))
-        {
-            http_response_code(400);
-            $firstNumber = 0;
-            echo "Number or numbers was not set . First number = $firstNumber";
-        }
-
-    }
-
-    /**
-     * @param int $secondNumber
-     */
-    public function setSecondNumber(int $secondNumber): void
-    {
-        if (isset($_POST['secondNumber']))
-        {
             $this->secondNumber = $secondNumber;
-        }
-        else
-        {
-            http_response_code(400);
-            echo "Number or numbers was not set";
-        }
     }
+
+
 }
